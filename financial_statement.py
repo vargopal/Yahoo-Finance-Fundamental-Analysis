@@ -6,6 +6,8 @@ balance_sheet = []
 income_statement = []
 cash_flow_analysis = []
 years = []
+stock_price = 0
+quote_table = []
 
 tickers = yf.tickers_sp500()
 
@@ -15,6 +17,10 @@ def get_data(ticker):
     global income_statement
     global cash_flow_analysis
     global years
+    global stock_price
+    global quote_table
+    stock_price = yf.get_live_price(ticker)
+    quote_table = yf.get_quote_table(ticker)
     balance_sheet = yf.get_balance_sheet(ticker)
     income_statement = yf.get_income_statement(ticker)
     cash_flow_analysis = yf.get_cash_flow(ticker)
@@ -135,6 +141,15 @@ def operating():
 
 
 
+pe_ratio = 0
+def pe():
+    global pe_ratio
+    pe_ratio = quote_table['PE Ratio (TTM)']
+    print(pe_ratio)
+
+
+
+
 for ticker in tickers[40:41]:
     try:
         get_data(ticker)
@@ -144,9 +159,10 @@ for ticker in tickers[40:41]:
         operating()
         f_score = profitability_score + leverage_score + operating_score
         print("Total Score: " + str(f_score))
+        pe()
     except:
         print(ticker + ": Something went wrong.")
 
-print(income_statement)
+print(stock_price)
 
 
