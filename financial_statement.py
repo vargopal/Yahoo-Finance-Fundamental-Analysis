@@ -1,3 +1,4 @@
+from ssl import ALERT_DESCRIPTION_UNKNOWN_PSK_IDENTITY
 import pandas as pd
 import yahoo_fin.stock_info as yf
 
@@ -98,6 +99,40 @@ def leverage():
     print(leverage_score)
 
 
+operating_score = 0
+def operating():
+    global operating_score
+    """
+    Gross margin and asset turnover ratio
+    """
+
+    # Gross Margin
+    gp = income_statement[years[0]]['grossProfit']
+    gp_1 = income_statement[years[1]]['grossProfit']
+    revenue = income_statement[years[0]]['totalRevenue']
+    revenue_1 = income_statement[years[1]]['totalRevenue']
+    gross_margin = gp/ revenue
+    gross_margin_1 = gp_1/revenue_1
+
+    if gross_margin > gross_margin_1:
+        margin_score = 1
+    else:
+        margin_score = 0
+    
+    # Asset Turnover
+    avg_assets_1 = (balance_sheet[years[0]]['totalAssets'] + balance_sheet[years[1]]['totalAssets'])/2   
+    avg_assets_2 = (balance_sheet[years[1]]['totalAssets'] + balance_sheet[years[2]]['totalAssets'])/2   
+    asset_turnover = revenue/ avg_assets_1
+    asset_turnover_1 = revenue_1/ avg_assets_2
+
+    if asset_turnover > asset_turnover_1:
+        asset_turnover_score = 1
+    else:
+        asset_turnover_score = 0
+
+    operating_score = margin_score + asset_turnover_score
+    print(operating_score)
+
 
 
 for ticker in tickers[40:41]:
@@ -106,9 +141,12 @@ for ticker in tickers[40:41]:
         print(ticker)
         profitability()
         leverage()
+        operating()
+        f_score = profitability_score + leverage_score + operating_score
+        print("Total Score: " + str(f_score))
     except:
         print(ticker + ": Something went wrong.")
 
-print(cash_flow_analysis)
+print(income_statement)
 
 
